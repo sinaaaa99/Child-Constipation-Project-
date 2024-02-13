@@ -10,5 +10,6 @@ data class Note(
     //doctor Type Will Be 1 And Parent Type Will Be 2
     val type:Int,
     val title:String,
-    val text:String
+    val text:String,
+    val importance:Int
 )

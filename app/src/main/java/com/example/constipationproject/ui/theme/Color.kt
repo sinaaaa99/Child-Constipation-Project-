@@ -54,3 +54,9 @@ val noteMenuColor1 = Color(0xFFEED3B5)
 val noteMenuColor2 = Color(0xFFEFBA9C)
 val noteMenuColor3 = Color(0xFFDFB582)
 
+
+//info
+val infoSelectedColor = Color(0xFF95BFBB)
+val saveButtonColor = Color(0xFFD9AA71)
+
+

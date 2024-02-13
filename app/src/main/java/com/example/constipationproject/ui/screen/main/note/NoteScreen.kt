@@ -48,7 +48,7 @@ fun NoteScreen(navHostController: NavHostController) {
 
             }, onAddClick = {
                 //on Doctor Add Click
-                navHostController.navigate("AddNoteScreen/1")
+                navHostController.navigate("AddNoteScreen/1/0")
 
             })
 
@@ -62,7 +62,7 @@ fun NoteScreen(navHostController: NavHostController) {
 
             }, onAddClick = {
                 //on parent Add Click
-                navHostController.navigate("AddNoteScreen/2")
+                navHostController.navigate("AddNoteScreen/2/0")
 
             })
 

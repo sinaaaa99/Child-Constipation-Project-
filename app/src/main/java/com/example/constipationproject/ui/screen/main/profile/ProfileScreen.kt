@@ -3,6 +3,7 @@ package com.example.constipationproject.ui.screen.main.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,14 +25,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.constipationproject.R
+import com.example.constipationproject.navigation.route.InformationScreens
 import com.example.constipationproject.ui.theme.backgroundColor
 import com.example.constipationproject.ui.theme.menuItemColor4
 import com.example.constipationproject.ui.theme.profileEditColor1
 import com.example.constipationproject.ui.theme.profileEditColor2
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navHostController: NavHostController) {
 
     Column(
         modifier = Modifier
@@ -59,7 +62,7 @@ fun ProfileScreen() {
             ) {
 
                 Text(
-                    text = "سلام سینا !",
+                    text = "سلام والد عزیز !",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -101,6 +104,9 @@ fun ProfileScreen() {
                 Box(
                     modifier = Modifier
                         .size(120.dp)
+                        .clickable {
+                            navHostController.navigate(InformationScreens.ChildInformation.route)
+                        }
                         .padding(4.dp)
                         .border(
                             width = 1.dp,
@@ -126,6 +132,9 @@ fun ProfileScreen() {
                 Box(
                     modifier = Modifier
                         .size(120.dp)
+                        .clickable {
+                            navHostController.navigate(InformationScreens.ParentInformation.route)
+                        }
                         .padding(4.dp)
                         .border(
                             width = 1.dp,

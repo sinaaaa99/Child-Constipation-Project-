@@ -1,7 +1,9 @@
 package com.example.constipationproject.ui.screen.main.note
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,8 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -28,32 +28,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.constipationproject.R
+import com.example.constipationproject.data.model.Note
 import com.example.constipationproject.ui.theme.ConstipationProjectTheme
 import com.example.constipationproject.ui.theme.backgroundColor
+import com.example.constipationproject.ui.theme.menuItemColor4
 import com.example.constipationproject.ui.theme.noteMenuColor
 import com.example.constipationproject.ui.theme.noteMenuColor1
+import com.example.constipationproject.ui.viewmodel.SharedViewModel
+import com.example.constipationproject.util.RequestState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddNoteScreen() {
+fun AddNoteScreen(navHostController: NavHostController, sharedViewModel: SharedViewModel) {
+
+    val context = LocalContext.current
 
     var title by remember {
         mutableStateOf("")
@@ -71,15 +77,87 @@ fun AddNoteScreen() {
         mutableStateOf("")
     }
     var importanceType by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     val scrollable = rememberScrollState()
+
+    val noteType by sharedViewModel.noteType.collectAsState()
+    val noteId by sharedViewModel.noteId.collectAsState()
+
+    val oneNote by sharedViewModel.oneNote.collectAsState()
+
+    if (noteId != 0) {
+
+        if (oneNote is RequestState.Success) {
+
+            val note = (oneNote as RequestState.Success<Note>).data
+
+            note?.let {
+
+                title = note.title
+                description = note.text
+                importanceType = note.importance
+
+                importance = when (note.importance) {
+                    1 -> {
+                        "مهم"
+                    }
+
+                    2 -> {
+                        "متوسط"
+                    }
+
+                    3 -> {
+                        "کم اهمیت"
+                    }
+
+                    else -> {
+                        ""
+                    }
+                }
+
+            }
+        }
+
+    } else {
+
+        LaunchedEffect(true) {
+            title = ""
+            description = ""
+            importance = ""
+            importanceType = 0
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
     ) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp, start = 12.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+
+            Box(modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+                .background(menuItemColor4)
+                .clickable { navHostController.popBackStack() }
+                .padding(8.dp)) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.left_arrow),
+                    contentDescription = "back Icon"
+                )
+            }
+
+        }
 
         Card(
             modifier = Modifier
@@ -101,7 +179,19 @@ fun AddNoteScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 12.dp),
-                    text = "یادداشت پزشک",
+                    text = when (noteType) {
+                        1 -> {
+                            "یادداشت پزشک"
+                        }
+
+                        2 -> {
+                            "یادداشت والد"
+                        }
+
+                        else -> {
+                            "یادداشت پزشک"
+                        }
+                    },
                     style = MaterialTheme.typography.titleMedium
                 )
                 //title textFiled
@@ -117,19 +207,18 @@ fun AddNoteScreen() {
                             text = "عنوان",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                    }, singleLine = true
+                    },
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 //importance dropDown
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
 
-                    ExposedDropdownMenuBox(
-                        expanded = isExpanded,
+                    ExposedDropdownMenuBox(expanded = isExpanded,
                         onExpandedChange = { isExpanded = it }) {
 
                         OutlinedTextField(
@@ -153,8 +242,7 @@ fun AddNoteScreen() {
                             singleLine = true
                         )
 
-                        ExposedDropdownMenu(
-                            expanded = isExpanded,
+                        ExposedDropdownMenu(expanded = isExpanded,
                             onDismissRequest = { isExpanded = false }) {
 
 
@@ -247,17 +335,45 @@ fun AddNoteScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                 ) {
 
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(noteMenuColor1)
-                            .padding(8.dp)
-                    ) {
+                    Box(modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(noteMenuColor1)
+                        .clickable {
+                            //on Save Click
+                            if (title
+                                    .trim()
+                                    .isBlank() || description
+                                    .trim()
+                                    .isBlank() || importanceType == 0
+                            ) {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "لطفا عنوان و توضیحات مربوطه را بنویسید!",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            } else {
+
+                                if (noteId == 0) {
+
+                                    val note = Note(0, noteType, title, description, importanceType)
+                                    sharedViewModel.insertNote(note)
+
+                                } else {
+                                    val note = Note(
+                                        noteId, noteType, title, description, importanceType
+                                    )
+                                    sharedViewModel.updateNote(note)
+                                }
+                                navHostController.popBackStack()
+                            }
+                        }
+                        .padding(8.dp)) {
 
                         Icon(
                             painter = painterResource(id = R.drawable.ic_check),
@@ -280,6 +396,6 @@ fun AddNoteScreenPreview() {
 
     ConstipationProjectTheme {
 
-        AddNoteScreen()
+//        AddNoteScreen()
     }
 }

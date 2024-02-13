@@ -27,7 +27,7 @@ fun NavGraphBuilder.homeNavGraph(
             NoteScreen(navHostController)
         }
         composable(route = MainScreens.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(navHostController)
         }
     }
 }

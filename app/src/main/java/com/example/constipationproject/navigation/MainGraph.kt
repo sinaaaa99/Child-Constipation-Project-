@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.constipationproject.navigation.education.educationNavGraph
 import com.example.constipationproject.navigation.home.homeNavGraph
+import com.example.constipationproject.navigation.info.informationNavGraph
 import com.example.constipationproject.navigation.note.noteNavGraph
 import com.example.constipationproject.navigation.route.HomeNavRoute
 import com.example.constipationproject.ui.viewmodel.SharedViewModel
@@ -27,6 +28,8 @@ fun MainGraph(
 
         educationNavGraph(navHostController, sharedViewModel)
 
-        noteNavGraph(navHostController,sharedViewModel)
+        noteNavGraph(navHostController, sharedViewModel)
+
+        informationNavGraph(navHostController, sharedViewModel)
     }
 }

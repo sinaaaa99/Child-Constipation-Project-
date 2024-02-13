@@ -3,8 +3,11 @@ package com.example.constipationproject.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.constipationproject.data.MenuClass
+import com.example.constipationproject.data.model.ChildInfo
 import com.example.constipationproject.data.model.ConsTitleWithText
 import com.example.constipationproject.data.model.ConstipationTitle
+import com.example.constipationproject.data.model.Note
+import com.example.constipationproject.data.model.ParentInfo
 import com.example.constipationproject.data.prepopulate.PrepopulateConsText
 import com.example.constipationproject.data.prepopulate.PrepopulateConsTitle
 import com.example.constipationproject.data.prepopulate.PrepopulateMenuItem
@@ -30,6 +33,10 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
     //for get Title With Text
     val educationId = MutableStateFlow(1)
     val shownPointIndex = MutableStateFlow(0)
+
+    //for find Type of Note
+    var noteType = MutableStateFlow(0)
+    var noteId = MutableStateFlow(0)
 
     //insert functions.................................................
 
@@ -73,6 +80,45 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
+    //insert Note
+    fun insertNote(note: Note) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.insertNote(note)
+
+        }
+    }
+
+    //update Note
+    fun updateNote(note: Note) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.updateNote(note)
+
+        }
+    }
+
+    //insert Parent Info
+    fun insertParentInfo(parentInfo: ParentInfo) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.insertParentInfo(parentInfo)
+        }
+    }
+
+
+    //insert Child Info
+    fun insertChildInfo(childInfo: ChildInfo) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.insertChildInfo(childInfo)
+        }
+    }
+
 
     //get functions..............................
 
@@ -81,16 +127,19 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
     val titles: StateFlow<RequestState<List<ConstipationTitle>>> = _titles
 
     fun getTitles() {
-
         _titles.value = RequestState.Loading
 
-        viewModelScope.launch(Dispatchers.IO) {
+        try {
 
-            repository.getTitles(educationType.value).collect { constipationTitleByType ->
+            viewModelScope.launch(Dispatchers.IO) {
 
-                _titles.value = RequestState.Success(constipationTitleByType)
+                repository.getTitles(educationType.value).collect { constipationTitleByType ->
 
+                    _titles.value = RequestState.Success(constipationTitleByType)
+
+                }
             }
+        } catch (_: Exception) {
         }
     }
 
@@ -103,13 +152,95 @@ class SharedViewModel @Inject constructor(private val repository: Repository) : 
 
         _titleAndText.value = RequestState.Loading
 
-        viewModelScope.launch(Dispatchers.IO) {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
 
-            repository.getTitleWithText(educationId.value).collect { titleWithText ->
+                repository.getTitleWithText(educationId.value).collect { titleWithText ->
 
-                _titleAndText.value = RequestState.Success(titleWithText)
+                    _titleAndText.value = RequestState.Success(titleWithText)
+
+                }
+            }
+
+        } catch (_: Exception) {
+        }
+    }
+
+    //get Notes
+    private val _notes = MutableStateFlow<RequestState<List<Note>>>(RequestState.Idle)
+    val notes: StateFlow<RequestState<List<Note>>> = _notes
+    fun getNotes() {
+        _notes.value = RequestState.Loading
+
+        try {
+
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.getNotes(noteType.value).collect { noteByType ->
+
+                    _notes.value = RequestState.Success(noteByType)
+                }
+
 
             }
+        } catch (_: Exception) {
+        }
+    }
+
+    //get Single Note
+    private val _oneNote = MutableStateFlow<RequestState<Note>>(RequestState.Idle)
+    val oneNote: StateFlow<RequestState<Note>> = _oneNote
+    fun getSingleNote() {
+        _oneNote.value = RequestState.Loading
+
+        try {
+
+            viewModelScope.launch(Dispatchers.IO) {
+                repository.getSingleNote(noteId.value).collect { note ->
+                    _oneNote.value = RequestState.Success(note)
+
+                }
+
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+
+    //get parent Info
+    private val _pInfo = MutableStateFlow<RequestState<ParentInfo>>(RequestState.Idle)
+    val pInfo: StateFlow<RequestState<ParentInfo>> = _pInfo
+
+    fun getParentInfo() {
+        _pInfo.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.getParentInfo.collect { parentInfo ->
+                _pInfo.value = RequestState.Success(parentInfo)
+            }
+        }
+    }
+
+
+    //get child Info
+    private val _cInfo = MutableStateFlow<RequestState<ChildInfo>>(RequestState.Idle)
+    val cInfo: StateFlow<RequestState<ChildInfo>> = _cInfo
+
+    fun getChildInfo() {
+        _cInfo.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.getChildInfo.collect { childInfo ->
+                _cInfo.value = RequestState.Success(childInfo)
+            }
+        }
+    }
+
+    //delete Note............
+    fun deleteNote() {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            repository.deleteNote(noteId.value)
         }
     }
 
